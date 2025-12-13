@@ -1,3 +1,4 @@
+from hashlib import md5
 import inspect
 import sys
 from typing import List
@@ -44,6 +45,14 @@ def day_3(part_1=True) -> int:
         x_bot += xi
         visited.add((y_bot, x_bot))
     return len(visited)
+
+
+def day_4(part_1=True) -> int:
+    key, cnt = read_input(day=4, delim=None), 0
+    k = md5((key + str(cnt)).encode()).hexdigest()
+    while not k[:5] == '00000' and (cnt := cnt+1):
+        k = md5(f'{key}{cnt}'.encode()).hexdigest()
+    return cnt
 
 
 if __name__ == '__main__':
