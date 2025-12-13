@@ -31,12 +31,18 @@ def day_2(part_1=True) -> int:
 
 def day_3(part_1=True) -> int:
     directions, visited = read_input(day=3, delim=None), {(0, 0)}
-    y, x, incs = 0, 0, dict(zip('v<>^', CARDINAL_DIRECTIONS))
-    for dir_ in directions:
+    incs = dict(zip('v<>^', CARDINAL_DIRECTIONS))
+    y_santa = x_santa = y_bot = x_bot = 0
+    for i, dir_ in enumerate(directions):
         yi, xi = incs[dir_]
-        y += yi
-        x += xi
-        visited.add((y, x))
+        if part_1 or not i % 2:
+            y_santa += yi
+            x_santa += xi
+            visited.add((y_santa, x_santa))
+            continue
+        y_bot += yi
+        x_bot += xi
+        visited.add((y_bot, x_bot))
     return len(visited)
 
 
