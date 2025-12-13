@@ -48,9 +48,9 @@ def day_3(part_1=True) -> int:
 
 
 def day_4(part_1=True) -> int:
-    key, cnt = read_input(day=4, delim=None), 0
-    k = md5((key + str(cnt)).encode()).hexdigest()
-    while not k[:5] == '00000' and (cnt := cnt+1):
+    key, cnt, num_zeroes = read_input(day=4, delim=None), 0, 5 + (not part_1)
+    k, zeroes = md5((key + str(cnt)).encode()).hexdigest(), '0' * num_zeroes
+    while not k[:num_zeroes] == zeroes and (cnt := cnt+1):
         k = md5(f'{key}{cnt}'.encode()).hexdigest()
     return cnt
 
