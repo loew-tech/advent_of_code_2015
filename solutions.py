@@ -3,6 +3,7 @@ import sys
 from typing import List
 
 from classes import Box
+from constants import CARDINAL_DIRECTIONS
 from utils import read_input
 
 
@@ -23,10 +24,20 @@ def day_2(part_1=True) -> int:
                                   parse=lambda ln: Box(*map(int,
                                                             ln.split('x')))
                                   )
-
     if part_1:
         return sum(box.wrapping_paper for box in boxes)
     return sum(box.ribbon for box in boxes)
+
+
+def day_3(part_1=True) -> int:
+    directions, visited = read_input(day=3, delim=None), {(0, 0)}
+    y, x, incs = 0, 0, dict(zip('v<>^', CARDINAL_DIRECTIONS))
+    for dir_ in directions:
+        yi, xi = incs[dir_]
+        y += yi
+        x += xi
+        visited.add((y, x))
+    return len(visited)
 
 
 if __name__ == '__main__':
