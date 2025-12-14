@@ -58,15 +58,29 @@ def day_4(part_1=True) -> int:
 def day_5(part_1=True) -> int:
     strings, cnt = read_input(day=5), 0
     bad, vowels = {'ab', 'cd', 'pq', 'xy'}, {'a', 'e', 'i', 'o', 'u'}
+    if part_1:
+        for s in strings:
+            prev, bad_, double_letter, vowel_cnt = None, False, False, 0
+            for c in s:
+                bad_ |= f'{prev}{c}' in bad
+                double_letter |= prev == c
+                vowel_cnt += c in vowels
+                prev = c
+            cnt += not bad_ and double_letter and vowel_cnt >= 3
+        return cnt
 
     for s in strings:
-        prev, bad_, double_letter, vowel_cnt = None, False, False, 0
+        pp_prev, p_prev, prev = None, None, None
+        repeated_pair, spaced_pair = False, False
+        pairs = set()
         for c in s:
-            bad_ |= f'{prev}{c}' in bad
-            double_letter |= prev == c
-            vowel_cnt += c in vowels
-            prev = c
-        cnt += not bad_ and double_letter and vowel_cnt >= 3
+            repeated_pair |= (p := f'{prev}{c}') in pairs and \
+                        not p == f'{p_prev}{prev}' or p == f'{pp_prev}{p_prev}'
+            pairs.add(p)
+
+            spaced_pair |= p_prev == c
+            pp_prev, p_prev, prev = p_prev, prev, c
+        cnt += repeated_pair and spaced_pair
     return cnt
 
 
