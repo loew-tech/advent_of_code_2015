@@ -55,6 +55,21 @@ def day_4(part_1=True) -> int:
     return cnt
 
 
+def day_5(part_1=True) -> int:
+    strings, cnt = read_input(day=5), 0
+    bad, vowels = {'ab', 'cd', 'pq', 'xy'}, {'a', 'e', 'i', 'o', 'u'}
+
+    for s in strings:
+        prev, bad_, double_letter, vowel_cnt = None, False, False, 0
+        for c in s:
+            bad_ |= f'{prev}{c}' in bad
+            double_letter |= prev == c
+            vowel_cnt += c in vowels
+            prev = c
+        cnt += not bad_ and double_letter and vowel_cnt >= 3
+    return cnt
+
+
 if __name__ == '__main__':
     args = (f'day_{i}' for i in (sys.argv[1:] if
                                  sys.argv[1:] else range(1, 26)) if
