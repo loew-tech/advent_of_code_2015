@@ -82,7 +82,7 @@ def day_5(part_1=True) -> int:
 
 
 def day_6(part_1=True) -> int:
-    def parse(ln: str):
+    def parse(ln: str) -> LightInterval:
         line = ln.split()
         action, i = (line[0], 1) if line[0] == 'toggle' else (line[1], 2)
         coord1, _, coord2 = line[i:]
@@ -90,44 +90,40 @@ def day_6(part_1=True) -> int:
         x1, y1 = map(int, coord2.split(','))
         return LightInterval(action, x0, y0, x1, y1)
 
-    def turn_on(intvrl: LightInterval) -> int:
-        cnt = 0
-        x_range = range(intvrl.x0, intvrl.x1 + 1)
+    def turn_on(intvrl: LightInterval) -> None:
         for y in range(intvrl.y0, intvrl.y1 + 1):
-            for x in x_range:
-                cnt += x not in on_lights[y]
-                on_lights[y].add(x)
-        return cnt
+            for x in range(intvrl.x0, intvrl.x1 + 1):
+                brightness[(y, x)] += 1
 
-    def turn_off(intvrl: LightInterval) -> int:
-        cnt = 0
-        x_range = range(intvrl.x0, intvrl.x1 + 1)
+    def turn_off(intvrl: LightInterval) -> None:
         for y in range(intvrl.y0, intvrl.y1 + 1):
-            for x in x_range:
-                cnt -= x in on_lights[y]
-                on_lights[y].discard(x)
-        return cnt
-
-    def toggle(intvrl: LightInterval) -> int:
-        cnt = 0
-        x_range = range(intvrl.x0, intvrl.x1 + 1)
-        for y in range(intvrl.y0, intvrl.y1 + 1):
-            for x in x_range:
-                if x not in on_lights[y]:
-                    cnt += 1
-                    on_lights[y].add(x)
+            for x in range(intvrl.x0, intvrl.x1 + 1):
+                if part_1:
+                    brightness[(y, x)] = 0
                     continue
-                cnt -= 1
-                on_lights[y].remove(x)
-        return cnt
+                brightness[(y, x)] = max(0, brightness[y, x] - 1)
 
-    on_lights, on_cnt = defaultdict(set), 0
+    def toggle(intvrl: LightInterval) -> None:
+        for y in range(intvrl.y0, intvrl.y1 + 1):
+            for x in range(intvrl.x0, intvrl.x1 + 1):
+                if part_1:
+                    if brightness[(y, x)]:
+                        brightness[(y, x)] = 0
+                    else:
+                        brightness[(y, x)] = 1
+                    continue
+                brightness[(y, x)] += 2
+
+    on_lights, brightness = defaultdict(set), defaultdict(int)
     actions = {'on': turn_on, 'off': turn_off, 'toggle': toggle}
     intervals = read_input(day=6, parse=parse)
 
     for interval in intervals:
-        on_cnt += actions[interval.action](interval)
-    return on_cnt
+        actions[interval.action](interval)
+
+    if part_1:
+        return sum(bool(v) for v in brightness.values())
+    return sum(v for v in brightness.values())
 
 
 if __name__ == '__main__':
