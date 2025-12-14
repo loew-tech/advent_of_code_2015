@@ -23,3 +23,6 @@ class Box:
     @property
     def ribbon(self):
         return 2 * (self.l + self.w) + self.volume
+
+
+LightInterval = namedtuple('LightInterval', ['action', 'x0', 'y0', 'x1', 'y1'])

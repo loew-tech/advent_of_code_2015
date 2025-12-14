@@ -1,9 +1,11 @@
+from bisect import bisect
+from collections import defaultdict
 from hashlib import md5
 import inspect
 import sys
 from typing import List
 
-from classes import Box
+from classes import Box, LightInterval
 from constants import CARDINAL_DIRECTIONS
 from utils import read_input
 
@@ -68,15 +70,64 @@ def day_5(part_1=True) -> int:
             double_letter |= prev == c
             vowel_cnt += c in vowels
 
-            pair |= (p := f'{prev}{c}') in pairs and \
-                    not p == f'{p_prev}{prev}' or \
-                    p == f'{pp_prev}{p_prev}'
+            pair |= (p := f'{prev}{c}') in pairs and (
+                    not p == f'{p_prev}{prev}' or
+                    p == f'{pp_prev}{p_prev}')
             pairs.add(p)
             spaced_pair |= p_prev == c
             pp_prev, p_prev, prev = p_prev, prev, c
         cnt += part_1 and not bad_ and double_letter and vowel_cnt >= 3
         cnt += not part_1 and pair and spaced_pair
     return cnt
+
+
+def day_6(part_1=True) -> int:
+    def parse(ln: str):
+        line = ln.split()
+        action, i = (line[0], 1) if line[0] == 'toggle' else (line[1], 2)
+        coord1, _, coord2 = line[i:]
+        x0, y0 = map(int, coord1.split(','))
+        x1, y1 = map(int, coord2.split(','))
+        return LightInterval(action, x0, y0, x1, y1)
+
+    def turn_on(intvrl: LightInterval) -> int:
+        cnt = 0
+        x_range = range(intvrl.x0, intvrl.x1 + 1)
+        for y in range(intvrl.y0, intvrl.y1 + 1):
+            for x in x_range:
+                cnt += x not in on_lights[y]
+                on_lights[y].add(x)
+        return cnt
+
+    def turn_off(intvrl: LightInterval) -> int:
+        cnt = 0
+        x_range = range(intvrl.x0, intvrl.x1 + 1)
+        for y in range(intvrl.y0, intvrl.y1 + 1):
+            for x in x_range:
+                cnt -= x in on_lights[y]
+                on_lights[y].discard(x)
+        return cnt
+
+    def toggle(intvrl: LightInterval) -> int:
+        cnt = 0
+        x_range = range(intvrl.x0, intvrl.x1 + 1)
+        for y in range(intvrl.y0, intvrl.y1 + 1):
+            for x in x_range:
+                if x not in on_lights[y]:
+                    cnt += 1
+                    on_lights[y].add(x)
+                    continue
+                cnt -= 1
+                on_lights[y].remove(x)
+        return cnt
+
+    on_lights, on_cnt = defaultdict(set), 0
+    actions = {'on': turn_on, 'off': turn_off, 'toggle': toggle}
+    intervals = read_input(day=6, parse=parse)
+
+    for interval in intervals:
+        on_cnt += actions[interval.action](interval)
+    return on_cnt
 
 
 if __name__ == '__main__':
