@@ -8,6 +8,7 @@ from operator import or_, and_, rshift, lshift, inv
 
 from classes import Box, LightInterval, LogicGate
 from constants import CARDINAL_DIRECTIONS
+from helpers import parse_day_7
 from utils import read_input
 
 
@@ -128,51 +129,17 @@ def day_6(part_1=True) -> int:
 
 
 def day_7(part_1=True) -> int:
-    graph, init_, values = defaultdict(list), {}, {}
-
-    operators = {"OR": or_, 'AND': and_, "RSHIFT": rshift,
-                 "LSHIFT": lshift, "NOT": inv}
-
-    def parse(data_: str) -> None:
-        for ln in data_.strip().split('\n'):
-            operation, wire = ln.split('->')
-            wire = wire.strip()
-            operation = operation.split()
-            if len(operation) == 1:
-                if operation[0].isdigit():
-                    values[wire] = int(operation[0])
-                    continue
-                graph[operation[0]].append(wire)
-                init_[wire] = LogicGate(op_=operators["OR"],
-                                        args=[operation[0],
-                                              operation[0]])
-                continue
-            if len(operation) == 2:
-                if operation[-1].isdigit():
-                    values[wire] = ~int(operation[-1])
-                    continue
-                graph[operation[-1]].append(wire)
-                init_[wire] = LogicGate(op_=operators['NOT'],
-                                        args=[operation[-1]])
-                continue
-            arg1, op, arg2 = (str_.strip() for str_ in operation)
-            if arg1.isdigit() and arg2.isdigit():
-                values[wire] = operation[op](int(arg1), int(arg2))
-                continue
-            graph[arg1].append(wire)
-            graph[arg2].append(wire)
-            init_[wire] = LogicGate(op_=operators[op],
-                                    args=[arg1, arg2])
-
     def get_value(k_: str) -> int | None:
         if k_.isdigit():
             return int(k_)
         return values.get(k_, None)
 
-    read_input(day=7, delim=None, parse=parse)
-    to_search = set()
-    for k in values:
-        to_search.update(graph.get(k, []))
+    initializes_graph, init_, values = read_input(day=7,
+                                                  delim=None,
+                                                  parse=parse_day_7)[0]
+    to_search = {wire for k in values
+                 for wire in initializes_graph.get(k, [])
+                 }
 
     while to_search:
         next_search = set()
@@ -182,9 +149,9 @@ def day_7(part_1=True) -> int:
             if any(arg is None for arg in args_):
                 continue
             values[key_] = gate.op_(*args_)
-            next_search.update(graph.get(key_, []))
+            next_search.update(initializes_graph.get(key_, []))
         to_search = next_search
-    return values['a']
+    return values['a'] if part_1 else NotImplemented
 
 
 if __name__ == '__main__':
