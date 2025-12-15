@@ -3,7 +3,7 @@ from collections import defaultdict
 from hashlib import md5
 import inspect
 import sys
-from typing import List
+from typing import List, Dict
 from operator import or_, and_, rshift, lshift, inv
 
 from classes import Box, LightInterval, LogicGate
@@ -129,29 +129,38 @@ def day_6(part_1=True) -> int:
 
 
 def day_7(part_1=True) -> int:
-    def get_value(k_: str) -> int | None:
+    def get_value(d: Dict[str, int], k_: str) -> int | None:
         if k_.isdigit():
             return int(k_)
-        return values.get(k_, None)
+        return d.get(k_, None)
 
     initializes_graph, init_, values = read_input(day=7,
                                                   delim=None,
                                                   parse=parse_day_7)[0]
-    to_search = {wire for k in values
-                 for wire in initializes_graph.get(k, [])
-                 }
 
-    while to_search:
-        next_search = set()
-        for key_ in to_search:
-            gate: LogicGate = init_[key_]
-            args_ = tuple(get_value(arg) for arg in gate.args)
-            if any(arg is None for arg in args_):
-                continue
-            values[key_] = gate.op_(*args_)
-            next_search.update(initializes_graph.get(key_, []))
-        to_search = next_search
-    return values['a'] if part_1 else NotImplemented
+    def solve(vals: Dict[str, int]) -> None:
+        print(f'{vals=}')
+        to_search = {wire for k in vals
+                     for wire in initializes_graph.get(k, [])
+                     }
+        while to_search:
+            next_search = set()
+            for key_ in to_search:
+                gate: LogicGate = init_[key_]
+                args_ = tuple(get_value(vals, arg) for arg in gate.args)
+                if any(arg is None for arg in args_):
+                    continue
+                vals[key_] = gate.op_(*args_)
+                next_search.update(initializes_graph.get(key_, []))
+            to_search = next_search
+
+    values_copy = {**values}
+    solve(values)
+    if part_1:
+        return values['a']
+    values_copy['b'] = values['a']
+    solve(values_copy)
+    return values_copy['a']
 
 
 if __name__ == '__main__':
