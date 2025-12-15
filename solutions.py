@@ -163,6 +163,21 @@ def day_7(part_1=True) -> int:
     return values_copy['a']
 
 
+def day_8(part_1=True) -> int:
+    data, ret = read_input(day=8), 0
+    dont_cnt = {
+        r'\\': (1, '-&-'),
+        r'\"': (1, ')&('),
+        r'\x': (3, '^&^')
+    }
+    for line in data:
+        ret += 2
+        for dnc, (w, spcl_chr) in dont_cnt.items():
+            line = line.replace(dnc, spcl_chr)
+            ret += line.count(spcl_chr) * w
+    return ret if part_1 else NotImplemented
+
+
 if __name__ == '__main__':
     args = (f'day_{i}' for i in (sys.argv[1:] if
                                  sys.argv[1:] else range(1, 26)) if
