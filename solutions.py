@@ -165,33 +165,24 @@ def day_7(part_1=True) -> int:
 
 def day_8(part_1=True) -> int:
     data, ret = read_input(day=8), 0
-    if part_1:
-        dont_cnt = {
-            r'\\': (1, '-&-'),
-            r'\"': (1, ')&('),
-            r'\x': (3, '^&^')
-        }
-        for line in data:
-            ret += 2
-            for dnc, (w, spcl_chr) in dont_cnt.items():
-                line = line.replace(dnc, spcl_chr)
-                ret += line.count(spcl_chr) * w
-        return ret
-
-    counts = {
-        r'"': (2, '-&-'),
-        r'\\': (2, ')&('),
-        r'\x': (1, '^&^')
+    inc_, dont_cnt = 2, {
+        r'\\': (1, '-&-'),
+        r'\"': (1, ')&('),
+        r'\x': (3, '^&^')
     }
-    for line in data:
-        temp = 0
-        for dnc, (w, spcl_chr) in counts.items():
-            line = line.replace(dnc, spcl_chr)
-            temp += line.count(spcl_chr) * w
-        ret += temp
-    return ret
+    if not part_1:
+        inc_, dont_cnt = 0, {
+            r'"': (2, '-&-'),
+            r'\\': (2, ')&('),
+            r'\x': (1, '^&^')
+        }
 
-# 2049 >
+    for line in data:
+        ret += inc_
+        for dnc, (w, spcl_chr) in dont_cnt.items():
+            line = line.replace(dnc, spcl_chr)
+            ret += line.count(spcl_chr) * w
+    return ret
 
 
 if __name__ == '__main__':
