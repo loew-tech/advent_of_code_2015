@@ -29,3 +29,5 @@ LightInterval = namedtuple('LightInterval', ['action', 'x0', 'y0', 'x1', 'y1'])
 
 
 LogicGate = namedtuple('LogicGate', ['op_', 'args'])
+
+Edge = namedtuple('Edge', ['wght', 'vertex'])
