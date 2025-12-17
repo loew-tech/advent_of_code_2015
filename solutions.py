@@ -136,10 +136,9 @@ def day_7(part_1=True) -> int:
 
     initializes_graph, init_, values = read_input(day=7,
                                                   delim=None,
-                                                  parse=parse_day_7)[0]
+                                                  parse=parse_day_7)
 
     def solve(vals: Dict[str, int]) -> None:
-        print(f'{vals=}')
         to_search = {wire for k in vals
                      for wire in initializes_graph.get(k, [])
                      }
@@ -198,10 +197,11 @@ def day_9(part_1=True) -> int | float:
 
     min_cost = float('inf')
 
-    def dfs(city_: str, used: Set[str], cost: int):
+    def dfs(city_: str, used: Set[str], cost: int) -> None:
         if used == graph.keys():
             nonlocal min_cost
             min_cost = min(min_cost, cost)
+            return
 
         for edge in graph[city_]:
             if edge.vertex in used:
@@ -210,7 +210,7 @@ def day_9(part_1=True) -> int | float:
             dfs(edge.vertex, used, cost + edge.wght)
             used.remove(edge.vertex)
 
-    graph: defaultdict = read_input(day=9, delim=None, parse=parse)[0]
+    graph: defaultdict = read_input(day=9, delim=None, parse=parse)
     sign = 1 if part_1 else -1
     for city in graph:
         dfs(city, {city}, 0)
@@ -218,7 +218,7 @@ def day_9(part_1=True) -> int | float:
 
 
 def day_10(part_1=True) -> int:
-    value = read_input(day=10)[0]
+    value = read_input(day=10, delim=None)
 
     def iterate(val: str) -> str:
         new_val, v, cnt = [], '', ''
@@ -233,6 +233,11 @@ def day_10(part_1=True) -> int:
     while (iterations := iterations-1) >= 0:
         value = iterate(value)
     return len(value)
+
+
+def day_11(part_1=True) -> int:
+    data = read_input(day=11, delim=None)
+    return NotImplemented
 
 
 if __name__ == '__main__':

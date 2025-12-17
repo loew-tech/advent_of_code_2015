@@ -11,7 +11,7 @@ def read_input(
         year: int | str = 2015,
         delim: str | None = '\n',
         parse: Callable[[str], any] = None
-) -> List[any] | str:
+) -> List[any] | str | any:
     if os.path.exists(f'{INPUTS_PATH}{day}.txt'):
         with open(f'{INPUTS_PATH}{day}.txt') as in_:
             return _process_input(in_.read(), delim, parse)
@@ -36,9 +36,12 @@ def _process_input(
         parse: Callable[[List[str] | str], any]
 ) -> any:
     data = text.strip().split(delim) if delim else text
-    return data if parse is None else [
-        parse(e) for e in (data if type(data) == list else [data])
-    ]
+    if parse is None:
+        return data
+    return [parse(e) for e in data] if type(data) == list else parse(data)
+    # return data if parse is None else [
+    #     parse(e) for e in (data if type(data) == list else [data])
+    # ]
 
 
 def get_inbounds(
