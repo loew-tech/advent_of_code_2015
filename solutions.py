@@ -217,6 +217,24 @@ def day_9(part_1=True) -> int | float:
     return sign * min_cost
 
 
+def day_10(part_1=True) -> int:
+    value = read_input(day=10)[0]
+
+    def iterate(val: str) -> str:
+        new_val, v, cnt = [], '', ''
+        for c in val:
+            if not c == v:
+                new_val.append(f'{cnt}{v}')
+                v, cnt = c, 0
+            cnt += 1
+        return f'{"".join(new_val)}{cnt}{v}'
+
+    iterations = 40 if part_1 else 50
+    while (iterations := iterations-1) >= 0:
+        value = iterate(value)
+    return len(value)
+
+
 if __name__ == '__main__':
     args = (f'day_{i}' for i in (sys.argv[1:] if
                                  sys.argv[1:] else range(1, 26)) if
