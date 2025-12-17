@@ -4,7 +4,7 @@ from collections import defaultdict
 from hashlib import md5
 import inspect
 import sys
-from typing import List, Dict
+from typing import List, Dict, Set
 
 from classes import Box, LightInterval, LogicGate, Edge
 from constants import CARDINAL_DIRECTIONS
@@ -185,35 +185,36 @@ def day_8(part_1=True) -> int:
     return ret
 
 
-def day_9(part_1=True) -> int:
+def day_9(part_1=True) -> int | float:
     def parse(data: str) -> defaultdict:
         grph = defaultdict(list)
+        sign_ = 1 if part_1 else -1
         for ln in data.strip().split('\n'):
             cities, distance = (s.strip() for s in ln.split('='))
             start, stop = (s.strip() for s in cities.split('to'))
-            heapq.heappush(grph[start], Edge(int(distance), stop))
-            heapq.heappush(grph[stop], Edge(int(distance), start))
+            heapq.heappush(grph[start], Edge(sign_ * int(distance), stop))
+            heapq.heappush(grph[stop], Edge(sign_ * int(distance), start))
         return grph
 
-    def modified_prims(start_city: str) -> int:
-        graph_: defaultdict = copy.deepcopy(graph)
-        used, current_city, cost = set(), start_city, 0
-        while current_city is not None:
-            used.add(current_city)
-            edge = Edge(0, current_city)
-            while graph_[current_city] and \
-                    (edge := heapq.heappop(
-                        graph_[current_city])).vertex in used:
-                pass
-            if edge.vertex in used:
-                current_city = None
-                continue
-            cost += edge.wght
-            current_city = edge.vertex
-        return cost if used == graph_.keys() else float('inf')
+    min_cost = float('inf')
 
-    graph = read_input(day=9, delim=None, parse=parse)[0]
-    return min(modified_prims(city) for city in graph)
+    def dfs(city_: str, used: Set[str], cost: int):
+        if used == graph.keys():
+            nonlocal min_cost
+            min_cost = min(min_cost, cost)
+
+        for edge in graph[city_]:
+            if edge.vertex in used:
+                continue
+            used.add(edge.vertex)
+            dfs(edge.vertex, used, cost + edge.wght)
+            used.remove(edge.vertex)
+
+    graph: defaultdict = read_input(day=9, delim=None, parse=parse)[0]
+    sign = 1 if part_1 else -1
+    for city in graph:
+        dfs(city, {city}, 0)
+    return sign * min_cost
 
 
 if __name__ == '__main__':
