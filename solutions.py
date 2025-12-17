@@ -235,9 +235,41 @@ def day_10(part_1=True) -> int:
     return len(value)
 
 
-def day_11(part_1=True) -> int:
-    data = read_input(day=11, delim=None)
-    return NotImplemented
+def day_11(part_1=True) -> str:
+    def increment(password_: List[int]) -> List[int]:
+        new_ = [*password_]
+        new_[-1] += 1
+        carry, index = new_[-1] > z, len(new_) - 1
+        while carry:
+            new_[index] = a
+            index -= 1
+            new_[index] += 1
+            carry = new_[index] > z
+        return new_
+
+    data, a, z = read_input(day=11, delim=None), ord('a'), ord('z')
+    data = [ord(c) for c in data]
+
+    def solve(password):
+        invalid = True
+        bad_chars = {ord('i'), ord('o'), ord('l')}
+        while invalid:
+            password = increment(password)
+            pair, run, bad_chr = False, False, False
+            pprev, prev, pairs = -1, -1, 0
+            for i in password:
+                pair += prev == i and not (pprev, prev) == (prev, i)
+                run |= pprev+2 == prev+1 == i
+                bad_chr |= i in bad_chars
+
+                pprev, prev = prev, i
+            invalid = pair < 2 or not run or bad_chr
+        return password
+
+    pw = solve(data)
+    if part_1:
+        return ''.join([chr(i) for i in pw])
+    return ''.join([chr(i) for i in solve(pw)])
 
 
 if __name__ == '__main__':
