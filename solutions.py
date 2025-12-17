@@ -1,7 +1,7 @@
-import copy
-import heapq
 from collections import defaultdict
 from hashlib import md5
+from json import loads
+import heapq
 import inspect
 import sys
 from typing import List, Dict, Set
@@ -270,6 +270,23 @@ def day_11(part_1=True) -> str:
     if part_1:
         return ''.join([chr(i) for i in pw])
     return ''.join([chr(i) for i in solve(pw)])
+
+
+def day_12(part_1=True) -> int:
+    data = read_input(day=12, delim=None)
+
+    def solve(content):
+        if type(content) == int:
+            return content
+        if type(content) == list:
+            return sum([solve(con) for con in content])
+        if type(content) == str:
+            return 0
+        if not part_1 and 'red' in content.values():
+            return 0
+        return solve(list(content.values()))
+
+    return solve(loads(data))
 
 
 if __name__ == '__main__':
