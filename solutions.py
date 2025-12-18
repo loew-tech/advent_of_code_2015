@@ -3,10 +3,11 @@ from hashlib import md5
 from json import loads
 import heapq
 import inspect
+import re
 import sys
 from typing import List, Dict, Set
 
-from classes import Box, LightInterval, LogicGate, Edge
+from classes import Box, LightInterval, LogicGate, Edge, Reindeer
 from constants import CARDINAL_DIRECTIONS
 from helpers import parse_day_7
 from utils import read_input
@@ -275,7 +276,7 @@ def day_11(part_1=True) -> str:
 def day_12(part_1=True) -> int:
     data = read_input(day=12, delim=None)
 
-    def solve(content):
+    def solve(content: int | str | List[any] | Dict[str, any]) -> int:
         if type(content) == int:
             return content
         if type(content) == list:
@@ -287,6 +288,20 @@ def day_12(part_1=True) -> int:
         return solve(list(content.values()))
 
     return solve(loads(data))
+
+
+def day_13(part_1=True) -> int:
+    data = read_input(day=13)
+    return NotImplemented
+
+
+def day_14(part_1=True) -> int:
+    def parse(ln: str) -> Reindeer:
+        ints = map(int, re.findall(r'\d+', ln))
+        return Reindeer(*ints)
+
+    data = read_input(day=14, parse=parse)
+    return max(r.move(2503) for r in data) if part_1 else NotImplemented
 
 
 if __name__ == '__main__':
