@@ -16,3 +16,6 @@ CARDINAL_DIRECTIONS = tuple((i, j) for i, j in DIRECTIONS
                             if not abs(i) == abs(j))
 
 OPS_DICT = {'+': add, '*': mul, '-': sub, '/': truediv, '//': floordiv}
+
+REGEX_WORDS = r'\b[a-zA-Z]+\b'
+REGEX_INTS = r'-?\d+'

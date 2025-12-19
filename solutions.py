@@ -10,7 +10,7 @@ import sys
 from typing import List, Dict, Set
 
 from classes import Box, LightInterval, LogicGate, Edge, Reindeer, Ingredient
-from constants import CARDINAL_DIRECTIONS
+from constants import CARDINAL_DIRECTIONS, REGEX_WORDS, REGEX_INTS
 from helpers import parse_day_7
 from utils import read_input
 
@@ -351,10 +351,12 @@ def day_14(part_1=True) -> int:
 
 
 def day_15(part_1=True) -> int:
-    ingredients = read_input(day=15, parse=lambda x: Ingredient(
-        *map(int, re.findall(r'-?\d+', x))
-    ))
-
+    ingredients: List[Ingredient] = read_input(day=15,
+                                               parse=lambda x: Ingredient(
+                                                   *map(int,
+                                                        re.findall(r'-?\d+',
+                                                                   x))
+                                               ))
     keys, max_ = ['capacity', 'durability', 'flavor', 'texture'], -1
 
     def solve(indx=0, counts_=None):
@@ -369,6 +371,10 @@ def day_15(part_1=True) -> int:
             solve(indx + 1, {**counts_})
 
     def get_score(counts_):
+        if not part_1 and \
+                not sum(
+                    ing.calories * counts_[ing] for ing in ingredients) == 500:
+            return -1
         return reduce(lambda x, y: x * y, [
             max(0,
                 sum(getattr(ing, field) * counts_[ing] for ing in ingredients))
@@ -376,7 +382,24 @@ def day_15(part_1=True) -> int:
         ])
 
     solve()
-    return max_ if part_1 else NotImplemented
+    return max_
+
+
+def day_16(part_1=True) -> int:
+    def parse(ln: str) -> Dict[str, int]:
+        return dict(zip(re.findall(REGEX_WORDS, ln)[1:],
+                        map(int, re.findall(REGEX_INTS, ln)[1:])))
+
+    sues: List[Dict[str, int]] = read_input(day=16, parse=parse)
+    target = {
+        'children': 3, 'cats': 7, 'samoyeds': 2, 'pomeranians': 3,
+        'goldfish': 5, 'trees': 3, 'cars': 2, 'perfumes': 1
+    }
+
+    for i, sue in enumerate(sues, start=1):
+        if part_1 and all(target.get(key, 0) == v for key, v in sue.items()):
+            return i
+    return NotImplemented
 
 
 if __name__ == '__main__':
