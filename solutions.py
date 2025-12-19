@@ -1,5 +1,6 @@
 from collections import defaultdict
 from hashlib import md5
+from itertools import permutations
 from json import loads
 import heapq
 import inspect
@@ -231,7 +232,7 @@ def day_10(part_1=True) -> int:
         return f'{"".join(new_val)}{cnt}{v}'
 
     iterations = 40 if part_1 else 50
-    while (iterations := iterations-1) >= 0:
+    while (iterations := iterations - 1) >= 0:
         value = iterate(value)
     return len(value)
 
@@ -260,7 +261,7 @@ def day_11(part_1=True) -> str:
             pprev, prev, pairs = -1, -1, 0
             for i in password:
                 pair += prev == i and not (pprev, prev) == (prev, i)
-                run |= pprev+2 == prev+1 == i
+                run |= pprev + 2 == prev + 1 == i
                 bad_chr |= i in bad_chars
 
                 pprev, prev = prev, i
@@ -291,8 +292,25 @@ def day_12(part_1=True) -> int:
 
 
 def day_13(part_1=True) -> int:
-    data = read_input(day=13)
-    return NotImplemented
+    def parse(data: str) -> Dict[str, Dict[str, int]]:
+        graph_ = defaultdict(dict)
+        for ln in data.strip().split('\n'):
+            wght = next(map(int, re.findall(r'\d+', ln)))
+            sign = 1 if 'gain' in ln else -1
+            src, *_, dest = ln.split()
+            graph_[src][dest[:-1]] = sign * wght
+        return graph_
+
+    def get_happiness(perm: str) -> int:
+        happiness = 0
+        for i, person in enumerate(perm):
+            happiness += graph[perm[i-1]][person]
+            happiness += graph[perm[(i+1) % len(graph)]][person]
+        return happiness
+
+    graph: defaultdict = read_input(day=13, delim=None, parse=parse)
+    perms = permutations(graph.keys(), len(graph.keys()))
+    return max(get_happiness(p) for p in perms)
 
 
 def day_14(part_1=True) -> int:
