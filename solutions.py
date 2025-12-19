@@ -395,11 +395,18 @@ def day_16(part_1=True) -> int:
         'children': 3, 'cats': 7, 'samoyeds': 2, 'pomeranians': 3,
         'goldfish': 5, 'trees': 3, 'cars': 2, 'perfumes': 1
     }
-
+    gt, lt = {'cats', 'trees'}, {'pomeranians', 'goldfish'}
     for i, sue in enumerate(sues, start=1):
         if part_1 and all(target.get(key, 0) == v for key, v in sue.items()):
-            return i
-    return NotImplemented
+            break
+
+        if not part_1 and \
+                all(sue.get(k, float('inf')) >= target[k] for k in gt) and \
+                all(sue.get(k, 0) <= target[k] for k in lt) and \
+                all(target.get(k, 0) == sue[k] for
+                    k in sue.keys() - {*gt, *lt}):
+            break
+    return i
 
 
 if __name__ == '__main__':
