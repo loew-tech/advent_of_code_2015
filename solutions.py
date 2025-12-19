@@ -309,6 +309,12 @@ def day_13(part_1=True) -> int:
         return happiness
 
     graph: defaultdict = read_input(day=13, delim=None, parse=parse)
+
+    if not part_1:
+        for k in[*graph]:
+            graph['-'][k] = 0
+            graph[k]['-'] = 0
+
     perms = permutations(graph.keys(), len(graph.keys()))
     return max(get_happiness(p) for p in perms)
 
