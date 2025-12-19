@@ -1,4 +1,5 @@
 from collections import defaultdict
+from functools import reduce
 from hashlib import md5
 from itertools import permutations
 from json import loads
@@ -8,7 +9,7 @@ import re
 import sys
 from typing import List, Dict, Set
 
-from classes import Box, LightInterval, LogicGate, Edge, Reindeer
+from classes import Box, LightInterval, LogicGate, Edge, Reindeer, Ingredient
 from constants import CARDINAL_DIRECTIONS
 from helpers import parse_day_7
 from utils import read_input
@@ -304,14 +305,14 @@ def day_13(part_1=True) -> int:
     def get_happiness(perm: str) -> int:
         happiness = 0
         for i, person in enumerate(perm):
-            happiness += graph[perm[i-1]][person]
-            happiness += graph[perm[(i+1) % len(graph)]][person]
+            happiness += graph[perm[i - 1]][person]
+            happiness += graph[perm[(i + 1) % len(graph)]][person]
         return happiness
 
     graph: defaultdict = read_input(day=13, delim=None, parse=parse)
 
     if not part_1:
-        for k in[*graph]:
+        for k in [*graph]:
             graph['-'][k] = 0
             graph[k]['-'] = 0
 
@@ -347,6 +348,35 @@ def day_14(part_1=True) -> int:
     if part_1:
         return max_distance
     return max(pts.values())
+
+
+def day_15(part_1=True) -> int:
+    ingredients = read_input(day=15, parse=lambda x: Ingredient(
+        *map(int, re.findall(r'-?\d+', x))
+    ))
+
+    keys, max_ = ['capacity', 'durability', 'flavor', 'texture'], -1
+
+    def solve(indx=0, counts_=None):
+        if counts_ is None:
+            counts_ = defaultdict(int)
+            counts_[ingredients[0]] = 100
+        nonlocal max_
+        max_ = max(max_, get_score(counts_))
+        while indx < len(ingredients) - 1 and counts_[ingredients[indx]]:
+            counts_[ingredients[indx]] -= 1
+            counts_[ingredients[indx + 1]] += 1
+            solve(indx + 1, {**counts_})
+
+    def get_score(counts_):
+        return reduce(lambda x, y: x * y, [
+            max(0,
+                sum(getattr(ing, field) * counts_[ing] for ing in ingredients))
+            for field in keys
+        ])
+
+    solve()
+    return max_ if part_1 else NotImplemented
 
 
 if __name__ == '__main__':

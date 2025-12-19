@@ -57,3 +57,7 @@ class Reindeer:
     def __repr__(self):
         return f'Reindeer(pace={self.pace}, duration={self.duration}, ' \
                f'rest={self.rest})'
+
+
+Ingredient = namedtuple('Ingredient', ['capacity', 'durability', 'flavor',
+                                       'texture', 'calories'])
