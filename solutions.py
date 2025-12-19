@@ -300,8 +300,18 @@ def day_14(part_1=True) -> int:
         ints = map(int, re.findall(r'\d+', ln))
         return Reindeer(*ints)
 
-    data = read_input(day=14, parse=parse)
-    return max(r.move(2503) for r in data) if part_1 else NotImplemented
+    reindeer: List[Reindeer] = read_input(day=14, parse=parse)
+
+    winning_reindeer: Reindeer = reindeer[-1]
+    time = 0
+    print(f'{reindeer[0]=}')
+    while (time := time + 1) <= 2503:
+        for r in reindeer:
+            if r.move() > winning_reindeer.distance:
+                winning_reindeer = r
+    if part_1:
+        return winning_reindeer.distance
+    return NotImplemented
 
 
 if __name__ == '__main__':
@@ -316,4 +326,4 @@ if __name__ == '__main__':
             print(f'{day}() = NotImplemented')
             continue
         print(f'{day}() = {funcs[day]()}')
-        print(f'{day}(part="B") = {funcs[day](part_1=False)}')
+        # print(f'{day}(part=2) = {funcs[day](part_1=False)}')

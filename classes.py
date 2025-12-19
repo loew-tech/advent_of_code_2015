@@ -27,7 +27,6 @@ class Box:
 
 LightInterval = namedtuple('LightInterval', ['action', 'x0', 'y0', 'x1', 'y1'])
 
-
 LogicGate = namedtuple('LogicGate', ['op_', 'args'])
 
 Edge = namedtuple('Edge', ['wght', 'vertex'])
@@ -37,13 +36,23 @@ class Reindeer:
 
     def __init__(self, pace, duration, rest):
         self.pace, self.duration, self.rest = pace, duration, rest
+        self.distance = 0
+        self.resting, self.next_rest = 0, self.duration
+        self.period_time, self.is_resting = 0, False
 
-    def move(self, time_limit: int) -> int:
-        time, distance = 0, 0
-        while time < time_limit:
-            distance += self.pace * (t := min(self.duration, time_limit-time))
-            time += t + self.rest
-        return distance
+    def move(self) -> int:
+        self.period_time += 1
+        if self.is_resting:
+            if self.period_time == self.rest:
+                self.period_time = 0
+                self.is_resting = False
+            return self.distance
+
+        self.distance += self.pace
+        if self.period_time == self.duration:
+            self.period_time = 0
+            self.is_resting = True
+        return self.distance
 
     def __repr__(self):
         return f'Reindeer(pace={self.pace}, duration={self.duration}, ' \
