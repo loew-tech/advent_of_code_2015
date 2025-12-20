@@ -7,7 +7,7 @@ import heapq
 import inspect
 import re
 import sys
-from typing import List, Dict, Set
+from typing import List, Dict, Set, Tuple
 
 from classes import Box, LightInterval, LogicGate, Edge, Reindeer, Ingredient
 from constants import CARDINAL_DIRECTIONS, DIRECTIONS, REGEX_WORDS, REGEX_INTS
@@ -423,7 +423,7 @@ def day_17(part_1=True) -> int:
         for i, b in enumerate(buckets):
             if i in used:
                 continue
-            solve(amt+b, tuple(sorted((*used, i))), target)
+            solve(amt + b, tuple(sorted((*used, i))), target)
 
     buckets = sorted(read_input(day=17, parse=lambda x: int(x)), reverse=True)
     matches = set()
@@ -433,7 +433,7 @@ def day_17(part_1=True) -> int:
 
 def day_18(part_1=True) -> int:
     def is_corner(y_, x_):
-        return y_ in {0, len(grid)-1} and x_ in {0, len(grid[0])-1}
+        return y_ in {0, len(grid) - 1} and x_ in {0, len(grid[0]) - 1}
 
     def toggle_lights():
         tmp_grid = [[*row] for row in grid]
@@ -441,8 +441,9 @@ def day_18(part_1=True) -> int:
             for x, b in enumerate(row):
                 if not part_1 and is_corner(y, x):
                     continue
-                on_nghbrs = sum(inbounds(y+yi, x+xi) and tmp_grid[y+yi][x+xi]
-                                for yi, xi in DIRECTIONS)
+                on_nghbrs = sum(
+                    inbounds(y + yi, x + xi) and tmp_grid[y + yi][x + xi]
+                    for yi, xi in DIRECTIONS)
                 if b and on_nghbrs not in {2, 3}:
                     grid[y][x] = False
                 if not b and on_nghbrs == 3:
@@ -450,14 +451,41 @@ def day_18(part_1=True) -> int:
 
     grid = read_input(day=18, parse=lambda x: [xi == '#' for xi in x])
     if not part_1:
-        for yy in (0, len(grid)-1):
-            for xx in (0, len(grid[0])-1):
+        for yy in (0, len(grid) - 1):
+            for xx in (0, len(grid[0]) - 1):
                 grid[yy][xx] = True
     inbounds = get_inbounds(grid)
 
     for _ in range(100):
         toggle_lights()
     return sum(sum(v for v in row) for row in grid)
+
+
+def day_19(part_1=True) -> int:
+    def parse(data: str) -> Tuple[defaultdict, str]:
+        relations_, chem = data.split('\n\n')
+        ret = defaultdict(list)
+        for relation in relations_.strip().split('\n'):
+            c1, c2 = relation.split('=>')
+            ret[c1.strip()].append(c2.strip())
+        return ret, chem
+
+    def find_all_occurrences(pattern, str_: str) -> List[int]:
+        return [m.start() for m in re.finditer(pattern, str_)]
+
+    def get_all_transformations(molecule) -> Set[str]:
+        ret = set()
+        indices = find_all_occurrences(molecule, chemical)
+        for i in indices:
+            ret |= {f'{chemical[:i]}{chemical[i:].replace(molecule, v_, 1)}'
+                    for v_ in mappings[molecule]}
+        return ret
+
+    mappings, chemical = read_input(day=19, delim=None, parse=parse)
+    chemicals = set()
+    for mol in mappings:
+        chemicals |= get_all_transformations(mol)
+    return len(chemicals) if part_1 else NotImplemented
 
 
 if __name__ == '__main__':
