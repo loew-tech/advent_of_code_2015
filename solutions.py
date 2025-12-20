@@ -410,10 +410,14 @@ def day_16(part_1=True) -> int:
 
 
 def day_17(part_1=True) -> int:
+    min_ = float('inf')
+
     @cache
     def solve(amt=0, used=(), target=150) -> None:
         if amt >= target and used not in matches:
             if amt == target:
+                nonlocal min_
+                min_ = min(min_, len(used))
                 matches.add(used)
         for i, b in enumerate(buckets):
             if i in used:
@@ -423,7 +427,7 @@ def day_17(part_1=True) -> int:
     buckets = sorted(read_input(day=17, parse=lambda x: int(x)), reverse=True)
     matches = set()
     solve()
-    return len(matches) if part_1 else NotImplemented
+    return len(matches) if part_1 else sum(len(m) == min_ for m in matches)
 
 
 if __name__ == '__main__':
