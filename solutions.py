@@ -10,9 +10,10 @@ import sys
 from typing import List, Dict, Set
 
 from classes import Box, LightInterval, LogicGate, Edge, Reindeer, Ingredient
-from constants import CARDINAL_DIRECTIONS, REGEX_WORDS, REGEX_INTS
+from constants import CARDINAL_DIRECTIONS, DIRECTIONS, REGEX_WORDS, REGEX_INTS
+from dbg_utils import *
 from helpers import parse_day_7
-from utils import read_input
+from utils import read_input, get_inbounds
 
 
 def day_1(part_1=True) -> int:
@@ -428,6 +429,35 @@ def day_17(part_1=True) -> int:
     matches = set()
     solve()
     return len(matches) if part_1 else sum(len(m) == min_ for m in matches)
+
+
+def day_18(part_1=True) -> int:
+    def is_corner(y_, x_):
+        return y_ in {0, len(grid)-1} and x_ in {0, len(grid[0])-1}
+
+    def toggle_lights():
+        tmp_grid = [[*row] for row in grid]
+        for y, row in enumerate(tmp_grid):
+            for x, b in enumerate(row):
+                if not part_1 and is_corner(y, x):
+                    continue
+                on_nghbrs = sum(inbounds(y+yi, x+xi) and tmp_grid[y+yi][x+xi]
+                                for yi, xi in DIRECTIONS)
+                if b and on_nghbrs not in {2, 3}:
+                    grid[y][x] = False
+                if not b and on_nghbrs == 3:
+                    grid[y][x] = True
+
+    grid = read_input(day=18, parse=lambda x: [xi == '#' for xi in x])
+    if not part_1:
+        for yy in (0, len(grid)-1):
+            for xx in (0, len(grid[0])-1):
+                grid[yy][xx] = True
+    inbounds = get_inbounds(grid)
+
+    for _ in range(100):
+        toggle_lights()
+    return sum(sum(v for v in row) for row in grid)
 
 
 if __name__ == '__main__':
