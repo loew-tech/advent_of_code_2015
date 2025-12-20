@@ -1,5 +1,5 @@
 from collections import defaultdict
-from functools import reduce
+from functools import reduce, cache
 from hashlib import md5
 from itertools import permutations
 from json import loads
@@ -407,6 +407,23 @@ def day_16(part_1=True) -> int:
                     k in sue.keys() - {*gt, *lt}):
             break
     return i
+
+
+def day_17(part_1=True) -> int:
+    @cache
+    def solve(amt=0, used=(), target=150) -> None:
+        if amt >= target and used not in matches:
+            if amt == target:
+                matches.add(used)
+        for i, b in enumerate(buckets):
+            if i in used:
+                continue
+            solve(amt+b, tuple(sorted((*used, i))), target)
+
+    buckets = sorted(read_input(day=17, parse=lambda x: int(x)), reverse=True)
+    matches = set()
+    solve()
+    return len(matches) if part_1 else NotImplemented
 
 
 if __name__ == '__main__':
