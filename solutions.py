@@ -1,3 +1,5 @@
+import math
+import time
 from collections import defaultdict
 from functools import reduce, cache
 from hashlib import md5
@@ -486,6 +488,26 @@ def day_19(part_1=True) -> int:
     for mol in mappings:
         chemicals |= get_all_transformations(mol)
     return len(chemicals) if part_1 else NotImplemented
+
+
+def day_20(part_1=True) -> int:
+    def get_presents(num: int) -> int:
+        total_presents = 0
+        limit = int(num ** .5)
+        for i_ in range(1, limit + 1):
+            if num % i_ == 0:
+                total_presents += i_ * 10
+                if not (j := num // i_) == i_:
+                    total_presents += j * 10
+        return total_presents
+
+    if not part_1:
+        return NotImplemented
+
+    target_ = read_input(day=20, delim=None, parse=lambda x: int(x))
+    for i in range(10, target_//10):
+        if get_presents(i) >= target_:
+            return i
 
 
 if __name__ == '__main__':
