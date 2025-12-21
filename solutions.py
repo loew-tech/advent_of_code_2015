@@ -497,15 +497,10 @@ def day_20(part_1=True) -> int:
         for i_ in range(1, limit + 1):
             if num % i_ == 0:
                 j = num // i_
-                if not part_1:
-                    if num // i_ <= 50:
-                        total_presents += i_ * 11
-                    if not j == i_ and num//j <= 50:
-                        total_presents += j * 11
-                    continue
-                total_presents += i_ * 10
-                if not j == i_:
-                    total_presents += j * 10
+                if part_1 or j <= 50:
+                    total_presents += i_ * (10 + (not part_1))
+                if not j == i_ and (part_1 or num//j <= 50):
+                    total_presents += j * (10 + (not part_1))
         return total_presents
 
     target_ = read_input(day=20, delim=None, parse=lambda x: int(x))
