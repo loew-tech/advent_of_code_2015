@@ -61,3 +61,7 @@ class Reindeer:
 
 Ingredient = namedtuple('Ingredient', ['capacity', 'durability', 'flavor',
                                        'texture', 'calories'])
+
+
+ShopItem = namedtuple('ShopItem', ['cost', 'dmg', 'armor'])
+Boss = namedtuple('Boss', ['hp', 'dmg', 'armor'])

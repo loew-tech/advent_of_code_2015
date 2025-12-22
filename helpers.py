@@ -1,8 +1,10 @@
 from collections import defaultdict
 from operator import lshift, or_, and_, inv, rshift
-from typing import Tuple
+import re
+from typing import Tuple, Dict
 
-from classes import LogicGate
+from classes import LogicGate, ShopItem
+from constants import REGEX_INTS
 
 
 def parse_day_7(data_: str) -> Tuple[defaultdict,
@@ -44,3 +46,15 @@ def parse_day_7(data_: str) -> Tuple[defaultdict,
                                 args=[arg1, arg2])
 
     return initializes_graph, init_, values
+
+
+def day_21_get_shop() -> defaultdict:
+    with open('inputs/21_shop.txt') as shop_file:
+        data = shop_file.read().split('\n\n')
+    shop = defaultdict(list)
+    for category in data:
+        cat = category.split(':')[0]
+        for ln in category.split('\n')[1:]:
+            stats = map(int, re.findall(REGEX_INTS, ' '.join(ln.split()[-3:])))
+            shop[cat].append(ShopItem(*stats))
+    return shop
