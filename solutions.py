@@ -511,63 +511,38 @@ def day_20(part_1=True) -> int:
 
 
 def day_21(part_1=True) -> int:
-    return NotImplemented
-    def get_player(equips: List[ShopItem]) -> Boss:
-        dmg = sum(item.dmg for item in equips)
-        armor = sum(item.armor for item in equips)
+    def get_player(w, a, r1, r2: ShopItem) -> Boss:
+        dmg = w.dmg + a.dmg + r1.dmg + r2.dmg
+        armor = w.armor + a.armor + r1.armor + r2.armor
         return Boss(hp=100, dmg=dmg, armor=armor)
 
-    def is_winner(equipment_) -> bool:
-        player = get_player(equipment_)
-        return math.ceil(player.hp // max(1, (boss.dmg - player.armor))) >= \
-               math.ceil(boss.hp // max(1, player.dmg - boss.armor))
+    def is_winner(w_, a_, r1_, r2_: ShopItem) -> bool:
+        player = get_player(w_, a_, r1_, r2_)
+        return math.ceil(player.hp / max(1, (boss.dmg - player.armor))) >= \
+               math.ceil(boss.hp / max(1, player.dmg - boss.armor))
 
     boss = Boss(*(map(int, re.findall(REGEX_INTS,
                                       read_input(day=21, delim=None)))))
     shop = day_21_get_shop()
-    for k, v in shop.items():
-        print(k, v)
-    print('\n')
+    shop['Armor'].append(ShopItem(cost=0, dmg=0, armor=0))
+    shop['Rings'].extend([ShopItem(cost=0, dmg=0, armor=0),
+                         ShopItem(cost=0, dmg=0, armor=0)])
 
     min_, n = float('inf'), len(shop['Rings'])
-    for w in shop['Weapons']:
-        equipment = [w]
-        print(f'{equipment=}')
-        if is_winner(equipment):
-            min_ = min(min_, sum(e.cost for e in equipment))
-        for a in shop['Armor']:
-            no_armor = [equipment[0]]
-            equipment.append(a)
-            print(f'\t{equipment=}')
-            if is_winner(equipment):
-                min_ = min(min_, sum(e.cost for e in equipment))
-            for i, r in enumerate(shop['Rings']):
-                equipment.append(r)
-                print(f'\t{equipment=}')
-                if is_winner(equipment):
-                    min_ = min(min_, sum(e.cost for e in equipment))
-                no_armor.append(r)
-                print(f'\t{no_armor=}')
-                if is_winner(no_armor):
-                    min_ = min(min_, sum(e.cost for e in no_armor))
+    for wpn in shop['Weapons']:
+        for amr in shop['Armor']:
+            for i, rng in enumerate(shop['Rings']):
                 for j in range(i, n):
-                    print('\n----------')
-                    equipment.append(shop['Rings'][j])
-                    print(f'\t\t{equipment=}')
-                    if is_winner(equipment):
-                        min_ = min(min_, sum(e.cost for e in equipment))
-                    no_armor.append(shop['Rings'][j])
-                    print(f'\t\t{no_armor=}')
-                    if is_winner(no_armor):
-                        min_ = min(min_, sum(e.cost for e in no_armor))
-                    equipment.pop()
-                    no_armor.pop()
-                equipment.pop()
-                no_armor.pop()
-            equipment.pop()
-            no_armor.pop()
-        input('break: ')
-    return min_
+                    rng2 = shop['Rings'][j]
+                    if is_winner(wpn, amr, rng, rng2):
+                        cost = wpn.cost + amr.cost + rng.cost + rng2.cost
+                        min_ = min(min_, cost)
+    return min_ if part_1 else NotImplemented
+
+
+def day_22(part_1=True) -> int:
+    read_input(day=22)
+    return NotImplemented
 
 
 if __name__ == '__main__':
