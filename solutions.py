@@ -526,18 +526,20 @@ def day_21(part_1=True) -> int:
     shop = day_21_get_shop()
     shop['Armor'].append(ShopItem(cost=0, dmg=0, armor=0))
     shop['Rings'].extend([ShopItem(cost=0, dmg=0, armor=0),
-                         ShopItem(cost=0, dmg=0, armor=0)])
+                          ShopItem(cost=0, dmg=0, armor=0)])
 
-    min_, n = float('inf'), len(shop['Rings'])
+    min_, max_, n = float('inf'), -1, len(shop['Rings'])
     for wpn in shop['Weapons']:
         for amr in shop['Armor']:
             for i, rng in enumerate(shop['Rings']):
-                for j in range(i, n):
+                for j in range(i + 1, n):
                     rng2 = shop['Rings'][j]
+                    cost = wpn.cost + amr.cost + rng.cost + rng2.cost
                     if is_winner(wpn, amr, rng, rng2):
-                        cost = wpn.cost + amr.cost + rng.cost + rng2.cost
                         min_ = min(min_, cost)
-    return min_ if part_1 else NotImplemented
+                        continue
+                    max_ = max(max_, cost)
+    return min_ if part_1 else max_
 
 
 def day_22(part_1=True) -> int:
